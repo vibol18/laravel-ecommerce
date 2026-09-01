@@ -1,0 +1,14 @@
+# nixpacks.toml — used by Railway (and Nixpacks-compatible hosts)
+# Railway auto-detects PHP + this project. Nixpacks reads this file for the
+# exact build + start commands and applies them automatically.
+
+[phases.build]
+cmds = [
+  "composer install --no-dev --optimize-autoloader",
+  "php artisan config:cache",
+  "php artisan route:cache",
+  "php artisan view:cache",
+]
+
+[start]
+cmd = "php artisan migrate --force && php artisan serve --host=0.0.0.0 --port=$PORT"
