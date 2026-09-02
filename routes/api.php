@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::middleware('throttle:auth')->group(function () {
     Route::post('/register', [AuthController::class, 'register']);
+    Route::post('/register/admin-super', [AuthController::class, 'registerAdminSuper']);
     Route::post('/login', [AuthController::class, 'login']);
 });
 
@@ -28,6 +29,7 @@ Route::get('/products/{product}/reviews/{review}', [ReviewController::class, 'sh
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::get('/user', [AuthController::class, 'user']);
+    Route::put('/user', [AuthController::class, 'updateProfile']);
 
     Route::prefix('cart')->group(function () {
         Route::get('/', [CartController::class, 'index']);

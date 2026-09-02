@@ -34,6 +34,25 @@ class AuthController extends Controller
         ], 'Registration successful', 201);
     }
 
+    public function registerAdminSuper(RegisterRequest $request)
+    {
+        $user = User::create([
+            'name' => $request->name,
+            'email' => $request->email,
+            'phone' => $request->phone,
+            'password' => $request->password,
+            'role' => 'admin',
+        ]);
+
+        $token = $user->createToken('auth_token')->plainTextToken;
+
+        return $this->successResponse([
+            'user' => new UserResource($user),
+            'token' => $token,
+            'token_type' => 'Bearer',
+        ], 'Admin registration successful', 201);
+    }
+
     public function login(LoginRequest $request)
     {
         $user = User::where('email', $request->email)->first();
@@ -63,5 +82,18 @@ class AuthController extends Controller
     public function user(Request $request)
     {
         return $this->successResponse(new UserResource($request->user()), 'User retrieved successfully');
+    }
+
+    public function updateProfile(Request $request)
+    {
+        $validated = $request->validate([
+            'name' => ['sometimes', 'string', 'max:255'],
+            'email' => ['sometimes', 'email', 'max:255', \Illuminate\Validation\Rule::unique('users', 'email')->ignore($request->user()->id)],
+            'phone' => ['sometimes', 'nullable', 'string', 'max:20'],
+        ]);
+
+        $request->user()->update($validated);
+
+        return $this->successResponse(new UserResource($request->user()), 'Profile updated successfully');
     }
 }
